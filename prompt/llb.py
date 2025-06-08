@@ -1,32 +1,7 @@
-class llb:
+from prompt import PromptingMethod
+import re
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-system = """
+system_prompt = """
 You are StanWriter. Given a description of a problem, you write Stan code.
 You always first write THOUGHTS START and then describe your model in words then THOUGHTS END. Then you write MODEL START and write the Stan code then MODEL END.
 Be creative when coming up with your model!
@@ -262,3 +237,27 @@ exemplars = [
     MODEL END
     """
 ]
+
+
+class LLB(PromptingMethod):
+    system_prompt = system_prompt
+    exemplars = exemplars
+    expected_response_blocks = ['stan_model']
+
+    def build_prompt(self, inst: str, **kwargs):
+        _tmp = ''
+        for e in self.exemplars:
+            _tmp = _tmp + e + '\n\n'
+        return system_prompt + '\n\nExamples:\n\n' + _tmp + inst
+
+    def parse_response(self, response: str, **kwargs):
+        parsed_blocks = {}
+        for block in self.expected_response_blocks:
+            if block == 'stan_model':
+                pattern = r"MODEL START(.*?)MODEL END"
+                matches = re.findall(pattern, response, re.DOTALL)
+                _tmp = [match.strip() for match in matches]
+                parsed_blocks[block] = _tmp[0]
+            else:
+                pass
+        return parsed_blocks
