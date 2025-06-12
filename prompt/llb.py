@@ -240,24 +240,34 @@ exemplars = [
 
 
 class LLB(PromptingMethod):
-    system_prompt = system_prompt
-    exemplars = exemplars
-    expected_response_blocks = ['stan_model']
+    def __init__(self):
+        self.system_prompt = system_prompt
+        self.exemplars = exemplars
+        self.expected_response_blocks = ['stan_model']
 
     def build_prompt(self, inst: str, **kwargs):
         _tmp = ''
         for e in self.exemplars:
             _tmp = _tmp + e + '\n\n'
-        return system_prompt + '\n\nExamples:\n\n' + _tmp + inst
+        return self.system_prompt + '\n\nExamples:\n\n' + _tmp + inst
 
     def parse_response(self, response: str, **kwargs):
+        assert isinstance(response, str)
+        status = True
         parsed_blocks = {}
         for block in self.expected_response_blocks:
             if block == 'stan_model':
                 pattern = r"MODEL START(.*?)MODEL END"
                 matches = re.findall(pattern, response, re.DOTALL)
                 _tmp = [match.strip() for match in matches]
-                parsed_blocks[block] = _tmp[0]
+                if _tmp:
+                    parsed_blocks[block] = _tmp[0]
+                else:
+                    parsed_blocks[block] = self.handle_none_match()
+                    status = False
             else:
                 pass
-        return parsed_blocks
+        return parsed_blocks, status
+
+    def handle_none_match(self, **kwargs):
+        return ''
