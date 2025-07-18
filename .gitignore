@@ -1,5 +1,3 @@
-helloworld.ipynb
-
 *.zip
 *.idea
 *.vscode
@@ -9,3 +7,5 @@ helloworld.ipynb
 *.pdf
 *__pycache__
 data/*
+
+stan_examples/

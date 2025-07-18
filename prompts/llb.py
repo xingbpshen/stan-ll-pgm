@@ -1,4 +1,4 @@
-from prompt import PromptingMethod
+from prompts import PromptingMethod
 import re
 
 system_prompt = """
