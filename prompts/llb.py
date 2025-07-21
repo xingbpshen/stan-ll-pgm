@@ -1,3 +1,6 @@
+# The implementation related to Large Language Bayes
+from typing import List
+
 from prompts import PromptingMethod
 import re
 
@@ -239,17 +242,27 @@ exemplars = [
 ]
 
 
-class LLB(PromptingMethod):
+class LLBPrompting(PromptingMethod):
     def __init__(self):
         self.system_prompt = system_prompt
         self.exemplars = exemplars
         self.expected_response_blocks = ['stan_model']
 
-    def build_prompt(self, inst: str, **kwargs):
+    def build_prompt(self, inst: str, **kwargs) -> List[dict]:
         _tmp = ''
         for e in self.exemplars:
             _tmp = _tmp + e + '\n\n'
-        return self.system_prompt + '\n\nExamples:\n\n' + _tmp + inst
+        messages = [
+            {
+                'role': 'developer',
+                'content': self.system_prompt
+            },
+            {
+                'role': 'user',
+                'content': _tmp + inst
+            }
+        ]
+        return messages
 
     def parse_response(self, response: str, **kwargs):
         assert isinstance(response, str)
@@ -269,5 +282,6 @@ class LLB(PromptingMethod):
                 pass
         return parsed_blocks, status
 
+    # used in parse_response when the expected block is not found
     def handle_none_match(self, **kwargs):
         return ''

@@ -4,9 +4,16 @@ from typing import Any
 
 # an abstract class for all prompting methods (e.g., LLB, LL-PGM)
 class PromptingMethod(ABC):
-    system_prompt = None    # str
-    exemplars = None    # list of strs
-    expected_response_blocks = None  # list of strs
+
+    @abstractmethod
+    def __init__(self, **kwargs):
+        """
+        Initialize the prompting method.
+        This method should set up any necessary attributes or configurations.
+        """
+        system_prompt = None  # str
+        exemplars = None
+        expected_response_blocks = None  # list of strs
 
     @abstractmethod
     def build_prompt(self, inst: str, **kwargs):
