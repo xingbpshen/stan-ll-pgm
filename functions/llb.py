@@ -8,7 +8,7 @@ def hybrid(data_point: dict, algo_n: int, algo_k: int, cache_folder: str, llb_pr
     assert 'id' in data_point
     assert 'data_path' in data_point
     assert 'instruction' in data_point
-    assert 'target_variable' in data_point and len(data_point['target_variable']) == 1
+    assert 'target_variable' in data_point and isinstance(data_point['target_variable'], str)
     messages = llb_prompting.build_prompt(data_point['instruction'])
     # set n in kwargs to algo_n
     kwargs['n'] = algo_n
